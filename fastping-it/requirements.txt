@@ -1,8 +1,7 @@
-# Updated requirements.txt for Ultimate FastPing Service
+# requirements.txt for Docker
 Flask==2.3.3
 Flask-SQLAlchemy==3.0.5
 Flask-Limiter==3.5.0
-Flask-Bootstrap==3.3.7.1
 requests==2.31.0
 python-dotenv==1.0.0
 gunicorn==21.2.0
