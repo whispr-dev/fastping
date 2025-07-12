@@ -1,7 +1,23 @@
-# requirements.txt
+# Updated requirements.txt for Ultimate FastPing Service
 Flask==2.3.3
 Flask-SQLAlchemy==3.0.5
 Flask-Limiter==3.5.0
+Flask-Bootstrap==3.3.7.1
 requests==2.31.0
 python-dotenv==1.0.0
 gunicorn==21.2.0
+redis==5.0.1
+orjson==3.9.10
+psutil==5.9.6
+
+# For cryptographic operations
+cryptography==41.0.7
+
+# For better datetime handling
+python-dateutil==2.8.2
+
+# For enhanced JSON handling
+ujson==5.8.0
+
+# Optional: For PostgreSQL support in production
+# psycopg2-binary==2.9.7
