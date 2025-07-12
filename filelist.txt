@@ -1,0 +1,99 @@
+Folder PATH listing for volume D:/
+Volume serial number is 6058-300D
+D:.
+|   .env
+|   .env.old
+|   .gitattributes
+|   .gitignore
+|   filelist.txt
+|   LICENSE
+|   README.md
+|   requirements.txt
+|   
++---api
+|       routes.py
+|       __init__.py
+|       
++---dashboard
+|   |   routes.py
+|   |   __init__.py
+|   |   
+|   \---templates
+|           index.html
+|           
++---fastping-it
+|   |   .docker_ignore
+|   |   api_system.py
+|   |   automated_onboarding.py
+|   |   auto_ip_assign.py
+|   |   billing_scheduler.py
+|   |   config.py
+|   |   configure_paypal.txt
+|   |   customer_resource_manager.py
+|   |   docker-compose.yml
+|   |   Dockerfile
+|   |   docker_deploy.ps1
+|   |   docker_deploy.sh
+|   |   live_stats_integration.py
+|   |   main_app.py
+|   |   master_app.py
+|   |   nginx.conf
+|   |   paypal_billing_integration.py
+|   |   proxy_test_app.py
+|   |   requirements_docker.txt
+|   |   setup_monthly_chronjob.txt
+|   |   ultimate_fastping_app.py
+|   |   
+|   +---data
+|   +---instance
+|   |       fastping.db
+|   |       
+|   +---logs
+|   +---ssl
+|   +---templates
+|   |   |   404.html
+|   |   |   about.html
+|   |   |   docs.html
+|   |   |   favicon.ico
+|   |   |   generate_sitemap.py
+|   |   |   index.html
+|   |   |   plat_buttons.txt
+|   |   |   privacy.html
+|   |   |   robots.txt
+|   |   |   stats.html
+|   |   |   Untitled-1.txt
+|   |   |   
+|   |   +---assets
+|   |   |       FastPing.It.co-qrcode.png
+|   |   |       fastpingit_logo.png
+|   |   |       fastping_blgnd.png
+|   |   |       fastping_semi.png
+|   |   |       favicon.png
+|   |   |       png_favicon.png
+|   |   |       
+|   |   +---css
+|   |   |       style.css
+|   |   |       
+|   |   +---js
+|   |          script.js
+|   |          
+|      \---plat_buttons
+|                  
+\---remove_end
+    |   Custom JSON Parser Setup.html
+    |   extensions.py
+    |   full_automate_tbd.txt
+    |   master_app.old
+    |   models.py
+    |   ping_utils.py
+    |   proxy-test-app.py
+    |   requirements.txt
+    |   run.py
+    |   tasks.py
+    |   
+    \---new_files
+            convo1-gpetey.txt
+            convo2-gpetey.txt
+            enhanced_live_stats.html
+            recentconvo-claude.txt
+            

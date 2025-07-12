@@ -1,6 +1,4 @@
 # docker-compose.yml
-version: '3.8'
-
 services:
   fastping:
     build: .
@@ -10,7 +8,7 @@ services:
       - ./data:/app/data
       - ./logs:/app/logs
     environment:
-      - DATABASE_URL=sqlite:///data/fastping.db
+      - DATABASE_URL=sqlite:///fastping.db
       - SECRET_KEY=${SECRET_KEY:-dev-secret-change-in-production}
       - PAYPAL_CLIENT_ID=${PAYPAL_CLIENT_ID}
       - PAYPAL_CLIENT_SECRET=${PAYPAL_CLIENT_SECRET}

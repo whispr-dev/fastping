@@ -10,21 +10,21 @@ RUN apt-get update && apt-get install -y \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements first for better caching
-COPY requirements.txt .
+# Copy ONLY the requirements file first
+COPY requirements_docker.txt requirements.txt
 
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy application code
+# Copy ONLY the main application file
 COPY ultimate_fastping_app.py .
 
 # Create directories for data persistence
 RUN mkdir -p /app/data /app/logs
 
-# Create non-root user for security
-RUN useradd -m -u 1000 fastping && chown -R fastping:fastping /app
-USER fastping
+# Skip user creation for now - run as root
+# RUN useradd -m -u 1000 fastping && chown -R fastping:fastping /app
+# USER fastping
 
 # Expose port
 EXPOSE 9876
