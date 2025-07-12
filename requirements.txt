@@ -1,0 +1,8 @@
+Flask==3.0.2
+Flask-SQLAlchemy==3.1.1
+Flask-Migrate==4.0.5
+Flask-SSE==0.2.1
+celery==5.4.0
+redis==5.0.4
+pythonping==1.2.2      # lightweight ICMP
+python-dotenv==1.0.1

@@ -1,0 +1,17 @@
+<!DOCTYPE html><html><head>
+<meta charset="utf-8"><title>FastPing Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="/stream"></script>
+<style>body{font-family:sans-serif;background:#111;color:#eee}canvas{max-width:90vw}</style>
+</head><body><h1>FastPing — live latency</h1>
+<canvas id="chart"></canvas><script>
+const ctx=document.getElementById('chart').getContext('2d');
+const data={labels:[],datasets:[{label:'ms',data:[],fill:false,borderWidth:1}]};
+const chart=new Chart(ctx,{type:'line',data});
+const src=new EventSource('/stream?channel={{ g.user.id if g.get("user") else "" }}');
+src.addEventListener('ping',e=>{const j=JSON.parse(e.data);
+  data.labels.push(new Date().toLocaleTimeString());
+  data.datasets[0].data.push(j.ms);
+  if(data.labels.length>60){data.labels.shift();data.datasets[0].data.shift();}
+  chart.update();});
+</script></body></html>
