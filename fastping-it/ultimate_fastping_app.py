@@ -614,7 +614,7 @@ def verify_paypal_webhook(request):
 @require_api_key
 @limiter.limit("1000 per minute")
 def api_ping():
-    """Ultra-fast ping endpoint for paid customers"""
+    """Ultra-fast ping endpoint for paid customers with flexible output"""
     start_time = time.time()
     
     customer = request.current_customer
@@ -637,7 +637,9 @@ def api_ping():
         'response_time_ms': round(response_time_ms, 2)
     }
     
-    return Response(orjson.dumps(result), mimetype='application/json')
+    # Add format support
+    format_type = get_response_format(request)
+    return format_response(result, format_type)
 
 # Proxy test endpoint (whitelisted IPs only)
 @app.route('/proxy-test', defaults={'path': ''})
@@ -677,36 +679,116 @@ def proxy_test_endpoint(path):
 @require_whitelisted_ip
 def json_endpoint(path=''):
     """Force JSON output"""
-    from werkzeug.datastructures import ImmutableMultiDict
-    request.args = ImmutableMultiDict([('format', 'json')] + list(request.args.items()))
-    return proxy_test_endpoint(path)
+    start_time = time.time()
+    
+    connecting_ip = request.remote_addr
+    client_ip_from_headers = get_client_ip(request)
+    server_processing_latency_ms = (time.time() - start_time) * 1000
+    anonymity_level = determine_anonymity(request, connecting_ip)
+    
+    response_data = {
+        "status": "success",
+        "service": "FastPing Proxy Test",
+        "path": f"/{path}",
+        "method": request.method,
+        "headers": dict(request.headers),
+        "connecting_ip": connecting_ip,
+        "client_ip_from_headers": client_ip_from_headers,
+        "anonymity_level": anonymity_level,
+        "speed_hint": determine_speed(server_processing_latency_ms),
+        "server_processing_latency_ms": round(server_processing_latency_ms, 2),
+        "plan": request.client_data['plan_type'],
+        "timestamp": datetime.utcnow().isoformat()
+    }
+    
+    return format_response(response_data, 'json')
 
 @app.route("/text")
 @app.route("/text/<path:path>")
 @require_whitelisted_ip
 def text_endpoint(path=''):
     """Force text output"""
-    from werkzeug.datastructures import ImmutableMultiDict
-    request.args = ImmutableMultiDict([('format', 'text')] + list(request.args.items()))
-    return proxy_test_endpoint(path)
+    start_time = time.time()
+    
+    connecting_ip = request.remote_addr
+    client_ip_from_headers = get_client_ip(request)
+    server_processing_latency_ms = (time.time() - start_time) * 1000
+    anonymity_level = determine_anonymity(request, connecting_ip)
+    
+    response_data = {
+        "status": "success",
+        "service": "FastPing Proxy Test",
+        "path": f"/{path}",
+        "method": request.method,
+        "headers": dict(request.headers),
+        "connecting_ip": connecting_ip,
+        "client_ip_from_headers": client_ip_from_headers,
+        "anonymity_level": anonymity_level,
+        "speed_hint": determine_speed(server_processing_latency_ms),
+        "server_processing_latency_ms": round(server_processing_latency_ms, 2),
+        "plan": request.client_data['plan_type'],
+        "timestamp": datetime.utcnow().isoformat()
+    }
+    
+    return format_response(response_data, 'text')
 
 @app.route("/html")
 @app.route("/html/<path:path>")
 @require_whitelisted_ip
 def html_endpoint(path=''):
     """Force HTML output"""
-    from werkzeug.datastructures import ImmutableMultiDict
-    request.args = ImmutableMultiDict([('format', 'html')] + list(request.args.items()))
-    return proxy_test_endpoint(path)
+    start_time = time.time()
+    
+    connecting_ip = request.remote_addr
+    client_ip_from_headers = get_client_ip(request)
+    server_processing_latency_ms = (time.time() - start_time) * 1000
+    anonymity_level = determine_anonymity(request, connecting_ip)
+    
+    response_data = {
+        "status": "success",
+        "service": "FastPing Proxy Test",
+        "path": f"/{path}",
+        "method": request.method,
+        "headers": dict(request.headers),
+        "connecting_ip": connecting_ip,
+        "client_ip_from_headers": client_ip_from_headers,
+        "anonymity_level": anonymity_level,
+        "speed_hint": determine_speed(server_processing_latency_ms),
+        "server_processing_latency_ms": round(server_processing_latency_ms, 2),
+        "plan": request.client_data['plan_type'],
+        "timestamp": datetime.utcnow().isoformat()
+    }
+    
+    return format_response(response_data, 'html')
 
 @app.route("/xml")
 @app.route("/xml/<path:path>")
 @require_whitelisted_ip
 def xml_endpoint(path=''):
     """Force XML output"""
-    from werkzeug.datastructures import ImmutableMultiDict
-    request.args = ImmutableMultiDict([('format', 'xml')] + list(request.args.items()))
-    return proxy_test_endpoint(path)
+    start_time = time.time()
+    
+    connecting_ip = request.remote_addr
+    client_ip_from_headers = get_client_ip(request)
+    server_processing_latency_ms = (time.time() - start_time) * 1000
+    anonymity_level = determine_anonymity(request, connecting_ip)
+    
+    response_data = {
+        "status": "success",
+        "service": "FastPing Proxy Test",
+        "path": f"/{path}",
+        "method": request.method,
+        "headers": dict(request.headers),
+        "connecting_ip": connecting_ip,
+        "client_ip_from_headers": client_ip_from_headers,
+        "anonymity_level": anonymity_level,
+        "speed_hint": determine_speed(server_processing_latency_ms),
+        "server_processing_latency_ms": round(server_processing_latency_ms, 2),
+        "plan": request.client_data['plan_type'],
+        "timestamp": datetime.utcnow().isoformat()
+    }
+    
+    return format_response(response_data, 'xml')
 
 # Health check
 @app.route('/health')
@@ -819,6 +901,161 @@ def create_test_customer():
         })
     else:
         return jsonify({'success': False, 'error': customer_id}), 400
+
+# API format-specific endpoints
+@app.route('/api/v1/ping/json', methods=['GET', 'POST'])
+@require_api_key
+@limiter.limit("1000 per minute")
+def api_ping_json():
+    """API ping endpoint - force JSON output"""
+    start_time = time.time()
+    
+    customer = request.current_customer
+    client_ip = get_client_ip(request)
+    
+    # Increment usage
+    customer.current_usage += 1
+    db.session.commit()
+    
+    response_time_ms = (time.time() - start_time) * 1000
+    
+    result = {
+        'status': 'success',
+        'message': 'FastPing service active',
+        'timestamp': datetime.utcnow().isoformat(),
+        'customer_id': customer.id,
+        'plan': customer.plan_type,
+        'usage': f"{customer.current_usage}/{customer.monthly_quota}",
+        'client_ip': client_ip,
+        'response_time_ms': round(response_time_ms, 2)
+    }
+    
+    return format_response(result, 'json')
+
+@app.route('/api/v1/ping/text', methods=['GET', 'POST'])
+@require_api_key
+@limiter.limit("1000 per minute")
+def api_ping_text():
+    """API ping endpoint - force text output"""
+    start_time = time.time()
+    
+    customer = request.current_customer
+    client_ip = get_client_ip(request)
+    
+    # Increment usage
+    customer.current_usage += 1
+    db.session.commit()
+    
+    response_time_ms = (time.time() - start_time) * 1000
+    
+    result = {
+        'status': 'success',
+        'message': 'FastPing service active',
+        'timestamp': datetime.utcnow().isoformat(),
+        'customer_id': customer.id,
+        'plan': customer.plan_type,
+        'usage': f"{customer.current_usage}/{customer.monthly_quota}",
+        'client_ip': client_ip,
+        'response_time_ms': round(response_time_ms, 2)
+    }
+    
+    return format_response(result, 'text')
+
+@app.route('/api/v1/ping/xml', methods=['GET', 'POST'])
+@require_api_key
+@limiter.limit("1000 per minute")
+def api_ping_xml():
+    """API ping endpoint - force XML output"""
+    start_time = time.time()
+    
+    customer = request.current_customer
+    client_ip = get_client_ip(request)
+    
+    # Increment usage
+    customer.current_usage += 1
+    db.session.commit()
+    
+    response_time_ms = (time.time() - start_time) * 1000
+    
+    result = {
+        'status': 'success',
+        'message': 'FastPing service active',
+        'timestamp': datetime.utcnow().isoformat(),
+        'customer_id': customer.id,
+        'plan': customer.plan_type,
+        'usage': f"{customer.current_usage}/{customer.monthly_quota}",
+        'client_ip': client_ip,
+        'response_time_ms': round(response_time_ms, 2)
+    }
+    
+    return format_response(result, 'xml')
+
+@app.route('/api/v1/ping/html', methods=['GET', 'POST'])
+@require_api_key
+@limiter.limit("1000 per minute")
+def api_ping_html():
+    """API ping endpoint - force HTML output"""
+    start_time = time.time()
+    
+    customer = request.current_customer
+    client_ip = get_client_ip(request)
+    
+    # Increment usage
+    customer.current_usage += 1
+    db.session.commit()
+    
+    response_time_ms = (time.time() - start_time) * 1000
+    
+    result = {
+        'status': 'success',
+        'message': 'FastPing service active',
+        'timestamp': datetime.utcnow().isoformat(),
+        'customer_id': customer.id,
+        'plan': customer.plan_type,
+        'usage': f"{customer.current_usage}/{customer.monthly_quota}",
+        'client_ip': client_ip,
+        'response_time_ms': round(response_time_ms, 2)
+    }
+    
+    return format_response(result, 'html')
+
+# Enhanced API proxy detection endpoint
+@app.route('/api/v1/proxy-test', methods=['GET', 'POST'])
+@require_api_key
+@limiter.limit("500 per minute")
+def api_proxy_test():
+    """Enhanced proxy detection via API with flexible output"""
+    start_time = time.time()
+    
+    customer = request.current_customer
+    connecting_ip = request.remote_addr
+    client_ip_from_headers = get_client_ip(request)
+    server_processing_latency_ms = (time.time() - start_time) * 1000
+    anonymity_level = determine_anonymity(request, connecting_ip)
+    
+    # Increment usage
+    customer.current_usage += 1
+    db.session.commit()
+    
+    response_data = {
+        "status": "success",
+        "service": "FastPing API Proxy Test",
+        "method": request.method,
+        "headers": dict(request.headers),
+        "connecting_ip": connecting_ip,
+        "client_ip_from_headers": client_ip_from_headers,
+        "anonymity_level": anonymity_level,
+        "speed_hint": determine_speed(server_processing_latency_ms),
+        "server_processing_latency_ms": round(server_processing_latency_ms, 2),
+        "customer_id": customer.id,
+        "plan": customer.plan_type,
+        "usage": f"{customer.current_usage}/{customer.monthly_quota}",
+        "timestamp": datetime.utcnow().isoformat()
+    }
+    
+    # Add format support
+    format_type = get_response_format(request)
+    return format_response(response_data, format_type)
 
 # Initialize database and customer manager
 def initialize_app():
