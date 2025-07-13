@@ -1,4 +1,4 @@
-Authorization: Bearer ak_64fa4b3ded4aa76062e89023a32014bf
+Authorization: Bearer ak_ddcff6d310e0386a087eb802713a0c55
 http://161.35.248.233/api/v1/ping
 status success  message  FastPing service active  
 timestamp 2025-07-13T19:16:14.19529  customer_id cust9a9580e7aab  
