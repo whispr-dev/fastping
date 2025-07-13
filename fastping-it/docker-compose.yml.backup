@@ -55,7 +55,17 @@ networks:
 volumes:
   redis-data:
 
-mailserver:
+
+# Added to existing docker-compose.yml re. endpoint to add mail
+version: '3.8'
+
+services:
+  # Your existing services...
+  fastping:
+    # ... existing config
+
+  # Ultra-fast Postfix + Dovecot mail server
+  mailserver:
     image: docker.io/mailserver/docker-mailserver:latest
     container_name: fastping-mailserver
     hostname: mail.fastping.it.com

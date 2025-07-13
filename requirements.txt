@@ -121,6 +121,7 @@ environs==10.0.0
 # SSL/TLS Support
 certifi==2023.11.17
 pyOpenSSL==23.3.0
+ssl
 
 # Performance Monitoring
 py-spy==0.3.14
@@ -160,7 +161,6 @@ MarkupSafe==2.1.3
 
 # Form Handling
 Flask-WTF==1.2.1
-email-validator==2.1.0
 
 # File Upload
 Flask-Uploads==0.2.1
@@ -187,3 +187,12 @@ psycopg2-binary
 # Testing
 pytest==7.4.3
 requests-mock==1.11.0
+
+# Mail
+email-validator==2.1.0
+secrets
+smtplib
+imaplib
+email
+email.mime.text
+email.mime.multipart

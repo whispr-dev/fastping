@@ -48,14 +48,8 @@ services:
     networks:
       - fastping-network
 
-networks:
-  fastping-network:
-    driver: bridge
-
-volumes:
-  redis-data:
-
-mailserver:
+  # Mail server - PROPERLY INDENTED UNDER SERVICES
+  mailserver:
     image: docker.io/mailserver/docker-mailserver:latest
     container_name: fastping-mailserver
     hostname: mail.fastping.it.com
@@ -72,7 +66,6 @@ mailserver:
       - ./mail-logs/:/var/log/mail/
       - ./config/:/tmp/docker-mailserver/
       - /etc/localtime:/etc/localtime:ro
-      - /etc/dkim:/tmp/docker-mailserver/opendkim/keys/fastping.it.com/
     environment:
       - ENABLE_SPAMASSASSIN=0  # Disable for speed
       - ENABLE_CLAMAV=0        # Disable for speed
@@ -92,6 +85,8 @@ mailserver:
       test: "ss -lntp | grep -E ':25|:587|:143|:993' || exit 1"
       timeout: 3s
       retries: 0
+    networks:
+      - fastping-network
 
   # Redis for mail caching (speed boost)
   mail-redis:
@@ -102,7 +97,12 @@ mailserver:
     volumes:
       - ./mail-redis-data:/data
     restart: unless-stopped
+    networks:
+      - fastping-network
 
 networks:
   fastping-network:
-    external: true
+    driver: bridge
+
+volumes:
+  redis-data:
