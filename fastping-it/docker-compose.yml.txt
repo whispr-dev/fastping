@@ -48,61 +48,21 @@ services:
     networks:
       - fastping-network
 
-  # Mail server - PROPERLY INDENTED UNDER SERVICES
-  mailserver:
-    image: docker.io/mailserver/docker-mailserver:latest
-    container_name: fastping-mailserver
-    hostname: mail.fastping.it.com
-    domainname: fastping.it.com
-    ports:
-      - "25:25"     # SMTP
-      - "143:143"   # IMAP
-      - "465:465"   # SMTPS
-      - "587:587"   # SMTP Submission
-      - "993:993"   # IMAPS
-    volumes:
-      - ./mail-data/:/var/mail/
-      - ./mail-state/:/var/mail-state/
-      - ./mail-logs/:/var/log/mail/
-      - ./config/:/tmp/docker-mailserver/
-      - /etc/localtime:/etc/localtime:ro
-    environment:
-      - ENABLE_SPAMASSASSIN=0  # Disable for speed
-      - ENABLE_CLAMAV=0        # Disable for speed
-      - ENABLE_FAIL2BAN=1      # Keep security
-      - ENABLE_POSTGREY=0      # Disable for speed
-      - ONE_DIR=1
-      - DMS_DEBUG=0
-      - OVERRIDE_HOSTNAME=mail.fastping.it.com
-      - POSTMASTER_ADDRESS=admin@fastping.it.com
-      - ENABLE_DKIM=1
-      - DKIM_SELECTOR=default
-    restart: unless-stopped
-    stop_grace_period: 1m
-    cap_add:
-      - NET_ADMIN
-    healthcheck:
-      test: "ss -lntp | grep -E ':25|:587|:143|:993' || exit 1"
-      timeout: 3s
-      retries: 0
-    networks:
-      - fastping-network
-
-  # Redis for mail caching (speed boost)
-  mail-redis:
-    image: redis:7-alpine
-    container_name: fastping-mail-redis
-    ports:
-      - "6380:6379"  # Different port from main Redis
-    volumes:
-      - ./mail-redis-data:/data
-    restart: unless-stopped
-    networks:
-      - fastping-network
-
-networks:
-  fastping-network:
-    driver: bridge
-
-volumes:
-  redis-data:
+  sed -i '/networks:/i\
+\
+  mailserver:\
+    image: docker.io/mailserver/docker-mailserver:latest\
+    container_name: fastping-mailserver\
+    hostname: mail.fastping.it.com\
+    ports:\
+      - "25:25"\
+      - "587:587"\
+      - "993:993"\
+    volumes:\
+      - ./config:/tmp/docker-mailserver\
+    environment:\
+      - OVERRIDE_HOSTNAME=mail.fastping.it.com\
+      - ENABLE_DKIM=1\
+    restart: unless-stopped\
+    networks:\
+      - fastping-network' docker-compose.yml
