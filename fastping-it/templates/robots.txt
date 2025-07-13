@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://fastping.it.whispr.dev/sitemap.xml

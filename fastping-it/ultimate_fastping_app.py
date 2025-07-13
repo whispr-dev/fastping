@@ -410,6 +410,93 @@ def determine_speed(latency_ms):
     else:
         return "slow"
 
+# Helper function to determine response format
+def get_response_format(request):
+    """Determine response format based on request parameters and headers"""
+    # Check URL parameter first
+    format_param = request.args.get('format', '').lower()
+    if format_param in ['json', 'text', 'xml', 'html']:
+        return format_param
+    
+    # Check Accept header
+    accept_header = request.headers.get('Accept', '').lower()
+    if 'application/json' in accept_header:
+        return 'json'
+    elif 'text/plain' in accept_header:
+        return 'text'
+    elif 'text/html' in accept_header:
+        return 'html'
+    elif 'application/xml' in accept_header:
+        return 'xml'
+    
+    # Default to JSON
+    return 'json'
+
+def format_response(data, format_type):
+    """Format response data based on requested format"""
+    if format_type == 'json':
+        return Response(orjson.dumps(data), mimetype='application/json')
+    
+    elif format_type == 'text':
+        # Simple text format
+        text_lines = [
+            f"Status: {data.get('status')}",
+            f"IP: {data.get('connecting_ip')}",
+            f"Anonymity: {data.get('anonymity_level')}",
+            f"Speed: {data.get('speed_hint')}",
+            f"Response Time: {data.get('server_processing_latency_ms', 0):.2f}ms"
+        ]
+        return Response('\n'.join(text_lines), mimetype='text/plain')
+    
+    elif format_type == 'xml':
+        # Simple XML format
+        xml_data = f"""<?xml version="1.0" encoding="UTF-8"?>
+<proxy_test>
+    <status>{data.get('status')}</status>
+    <connecting_ip>{data.get('connecting_ip')}</connecting_ip>
+    <anonymity_level>{data.get('anonymity_level')}</anonymity_level>
+    <speed_hint>{data.get('speed_hint')}</speed_hint>
+    <response_time_ms>{data.get('server_processing_latency_ms', 0):.2f}</response_time_ms>
+</proxy_test>"""
+        return Response(xml_data, mimetype='application/xml')
+    
+    elif format_type == 'html':
+        # Pretty HTML format
+        html_data = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Proxy Test Results</title>
+            <style>
+                body {{ font-family: Arial, sans-serif; margin: 40px; background: #f5f5f5; }}
+                .container {{ background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }}
+                .result {{ padding: 10px; margin: 5px 0; background: #e9ecef; border-radius: 5px; }}
+                .success {{ background: #d4edda; color: #155724; }}
+                .speed-fast {{ color: #28a745; }}
+                .speed-medium {{ color: #ffc107; }}
+                .speed-slow {{ color: #dc3545; }}
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <h1>🔍 Proxy Test Results</h1>
+                <div class="result success">Status: {data.get('status')}</div>
+                <div class="result">Connecting IP: <strong>{data.get('connecting_ip')}</strong></div>
+                <div class="result">Client IP from Headers: <strong>{data.get('client_ip_from_headers')}</strong></div>
+                <div class="result">Anonymity Level: <strong>{data.get('anonymity_level')}</strong></div>
+                <div class="result speed-{data.get('speed_hint', 'medium')}">Speed: <strong>{data.get('speed_hint')}</strong></div>
+                <div class="result">Response Time: <strong>{data.get('server_processing_latency_ms', 0):.2f}ms</strong></div>
+                <div class="result">Method: {data.get('method')}</div>
+                <div class="result">Path: {data.get('received_path')}</div>
+            </div>
+        </body>
+        </html>
+        """
+        return Response(html_data, mimetype='text/html')
+    
+    # Fallback to JSON
+    return Response(orjson.dumps(data), mimetype='application/json')
+
 # Authentication decorators
 def require_api_key(f):
     """Require API key authentication"""
@@ -557,7 +644,7 @@ def api_ping():
 @app.route('/proxy-test/<path:path>')
 @require_whitelisted_ip
 def proxy_test_endpoint(path):
-    """Ultra-fast proxy testing for whitelisted IPs"""
+    """Ultra-fast proxy testing for whitelisted IPs with flexible output"""
     start_time = time.time()
     
     connecting_ip = request.remote_addr
@@ -572,15 +659,54 @@ def proxy_test_endpoint(path):
         "method": request.method,
         "headers": dict(request.headers),
         "connecting_ip": connecting_ip,
-        "client_ip": client_ip_from_headers,
+        "client_ip_from_headers": client_ip_from_headers,
         "anonymity_level": anonymity_level,
-        "speed": determine_speed(server_processing_latency_ms),
-        "response_time_ms": round(server_processing_latency_ms, 2),
+        "speed_hint": determine_speed(server_processing_latency_ms),
+        "server_processing_latency_ms": round(server_processing_latency_ms, 2),
         "plan": request.client_data['plan_type'],
         "timestamp": datetime.utcnow().isoformat()
     }
     
-    return Response(orjson.dumps(response_data), mimetype='application/json')
+    # Determine response format and return accordingly
+    format_type = get_response_format(request)
+    return format_response(response_data, format_type)
+
+# Dedicated format-specific endpoints for convenience
+@app.route("/json")
+@app.route("/json/<path:path>")
+@require_whitelisted_ip
+def json_endpoint(path=''):
+    """Force JSON output"""
+    from werkzeug.datastructures import ImmutableMultiDict
+    request.args = ImmutableMultiDict([('format', 'json')] + list(request.args.items()))
+    return proxy_test_endpoint(path)
+
+@app.route("/text")
+@app.route("/text/<path:path>")
+@require_whitelisted_ip
+def text_endpoint(path=''):
+    """Force text output"""
+    from werkzeug.datastructures import ImmutableMultiDict
+    request.args = ImmutableMultiDict([('format', 'text')] + list(request.args.items()))
+    return proxy_test_endpoint(path)
+
+@app.route("/html")
+@app.route("/html/<path:path>")
+@require_whitelisted_ip
+def html_endpoint(path=''):
+    """Force HTML output"""
+    from werkzeug.datastructures import ImmutableMultiDict
+    request.args = ImmutableMultiDict([('format', 'html')] + list(request.args.items()))
+    return proxy_test_endpoint(path)
+
+@app.route("/xml")
+@app.route("/xml/<path:path>")
+@require_whitelisted_ip
+def xml_endpoint(path=''):
+    """Force XML output"""
+    from werkzeug.datastructures import ImmutableMultiDict
+    request.args = ImmutableMultiDict([('format', 'xml')] + list(request.args.items()))
+    return proxy_test_endpoint(path)
 
 # Health check
 @app.route('/health')
