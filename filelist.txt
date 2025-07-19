@@ -2,98 +2,64 @@ Folder PATH listing for volume D:/
 Volume serial number is 6058-300D
 D:.
 |   .env
-|   .env.old
+|   .env.example
 |   .gitattributes
 |   .gitignore
+|   admin_instructions.md
+|   color_customer_dashboard.py
 |   filelist.txt
+|   health-load.ps1
+|   hey
 |   LICENSE
+|   linux_beacon
+|   linux_beacon_127
+|   linux_beacon_161
+|   linux_json_listener
+|   linux_listener.cpp
+|   listener
+|   public_key.txt
 |   README.md
 |   requirements.txt
+|   setup.sh
+|   START_HERE
+|   stats.html
+|   subtle_beacon.exe
+|   usr-wofl_info.txt
+|   win-performance-test.ps1
 |   
-+---api
-|       routes.py
-|       __init__.py
++---api_access
+|       api.py
 |       
-+---dashboard
-|   |   routes.py
-|   |   __init__.py
-|   |   
-|   \---templates
-|           index.html
-|           
-+---fastping-it
-|   |   .docker_ignore
-|   |   api_system.py
-|   |   automated_onboarding.py
-|   |   auto_ip_assign.py
-|   |   billing_scheduler.py
-|   |   config.py
-|   |   configure_paypal.txt
-|   |   customer_resource_manager.py
-|   |   docker-compose.yml
-|   |   Dockerfile
-|   |   docker_deploy.ps1
-|   |   docker_deploy.sh
-|   |   live_stats_integration.py
-|   |   main_app.py
-|   |   master_app.py
-|   |   nginx.conf
-|   |   paypal_billing_integration.py
-|   |   proxy_test_app.py
-|   |   requirements_docker.txt
-|   |   setup_monthly_chronjob.txt
-|   |   ultimate_fastping_app.py
-|   |   
-|   +---data
-|   +---instance
-|   |       fastping.db
-|   |       
-|   +---logs
-|   +---ssl
-|   +---templates
-|   |   |   404.html
-|   |   |   about.html
-|   |   |   docs.html
-|   |   |   favicon.ico
-|   |   |   generate_sitemap.py
-|   |   |   index.html
-|   |   |   plat_buttons.txt
-|   |   |   privacy.html
-|   |   |   robots.txt
-|   |   |   stats.html
-|   |   |   Untitled-1.txt
-|   |   |   
-|   |   +---assets
-|   |   |       FastPing.It.co-qrcode.png
-|   |   |       fastpingit_logo.png
-|   |   |       fastping_blgnd.png
-|   |   |       fastping_semi.png
-|   |   |       favicon.png
-|   |   |       png_favicon.png
-|   |   |       
-|   |   +---css
-|   |   |       style.css
-|   |   |       
-|   |   +---js
-|   |          script.js
-|   |          
-|      \---plat_buttons
-|                  
-\---remove_end
-    |   Custom JSON Parser Setup.html
-    |   extensions.py
-    |   full_automate_tbd.txt
-    |   master_app.old
-    |   models.py
-    |   ping_utils.py
-    |   proxy-test-app.py
-    |   requirements.txt
-    |   run.py
-    |   tasks.py
++---css
+|       style.css
+|       
++---examples
+|       example_batch.json
+|       
+\---fastping-it
+    |   customer_resource_manager.py
+    |   docker-compose.old
+    |   docker-compose.yml
+    |   docker-compose.yml.backup
+    |   docker-compose.yml.txt
+    |   Dockerfile
+    |   docker_deploy.ps1
+    |   docker_deploy.sh
+    |   hey
+    |   nginx.conf
+    |   ultimate_fastping_app.b4m
+    |   ultimate_fastping_app.gud
+    |   ultimate_fastping_app.old
+    |   ultimate_fastping_app.py
+    |   ultimate_fastping_app_backup.py
     |   
-    \---new_files
-            convo1-gpetey.txt
-            convo2-gpetey.txt
-            enhanced_live_stats.html
-            recentconvo-claude.txt
-            
+    +---config
+    |   \---postfix
+    |           main.cf
+    |           
+    +---docs
+    |       latencoes_esplained.txt
+    |       
+    +---mail-data
+    +---mail-logs
+    \---mail-state
